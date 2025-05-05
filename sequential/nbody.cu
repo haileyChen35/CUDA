@@ -6,7 +6,7 @@
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 
-__constant__ double G = 6.674*std::pow(10,-11);
+double G = 6.674e-11;
 //double G = 1;
 
 struct simulation {
