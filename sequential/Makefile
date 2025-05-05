@@ -1,7 +1,7 @@
 CXXFLAGS=-O3
 
 nbody: nbody.cpp
-	g++ -O3 nbody.cpp -o nbody
+	nvcc -O3 nbody.cpp -o nbody
 
 solar.out: nbody
 	date

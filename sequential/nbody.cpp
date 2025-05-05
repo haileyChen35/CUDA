@@ -166,7 +166,7 @@ __global__ void calculateForcesKernel(double* fx, double* fy, double* fz,
         double dy = y[j] - y[i];
         double dz = z[j] - z[i];
         double distSqr = dx*dx + dy*dy + dz*dz + 1e-9;
-        double invDist = rsqrt(distSqr);
+        double invDist = 1.0 / sqrt(distSqr);
         double invDist3 = invDist * invDist * invDist;
         double f = G * mass[i] * mass[j] * invDist3;
 
@@ -295,7 +295,7 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    simulation s;
+    simulation s(std::stoul(argv[1]));
     load_from_file(argv[1], s);
     double dt = atof(argv[2]);
     int steps = atoi(argv[3]);
