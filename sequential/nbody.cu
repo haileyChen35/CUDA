@@ -291,22 +291,58 @@ void load_from_file(const char* filename, simulation& s) {
 
 int main(int argc, char** argv) {
     if (argc < 4) {
-        std::cerr << "Usage: " << argv[0] << " <input_file> <dt> <nbsteps>\n";
+        std::cerr << "Usage: " << argv[0] << " <input_file> <dt> <steps>\n";
         return 1;
     }
 
-    simulation s(0);
+    simulation s(1);
     load_from_file(argv[1], s);
     double dt = atof(argv[2]);
     int steps = atoi(argv[3]);
+    size_t printevery = std::atol(argv[4]);
+    int blockSize = std::atol(argv[5]);
 
-    for (int step = 0; step < steps; ++step) {
-        calculate_forces(s);
-        apply_force(s, dt);
-        update_position(s, dt);
-        dump_state(s);
-    }
-
-    free_device(s);
-    return 0;
+    {
+        size_t nbpart = std::atol(argv[1]); 
+        if ( nbpart > 0) {
+          if (s.nbpart != nbpart) {
+            s.resize(nbpart);
+          }
+          random_init(s);
+        } else {
+          std::string inputparam = argv[1];
+          if (inputparam == "planet") {
+            if (s.nbpart != 10) {
+              s.resize(10);
+            }
+            init_solar(s); 
+          } else{
+        loadfrom_file(s, inputparam);
+          }
+        }    
+      }
+    
+      int numBlocks = (s.nbpart + blockSize - 1) / blockSize;
+    
+      auto start = std::chrono::high_resolution_clock::now();
+      for (size_t step = 0; step< steps; step++) {
+        /*if (step %printevery == 0) {
+          s.copy_from_device();
+        }*/
+      reset_force_kernel<<<numBlocks, blockSize>>>(s.dfx, s.dfy, s.dfz, s.nbpart);
+      compute_force_kernel<<<numBlocks, blockSize>>>(s.dmass, s.dx, s.dy, s.dz, s.dfx, s.dfy, s.dfz, s.nbpart, G);
+      update_particles_kernel<<<numBlocks, blockSize>>>(s.dx, s.dy, s.dz, s.dvx, s.dvy, s.dvz, s.dfx, s.dfy, s.dfz, s.dmass, s.nbpart, dt);
+      }
+      CUDA_CHECK(cudaDeviceSynchronize());
+      CUDA_CHECK(cudaGetLastError());
+    
+      auto end = std::chrono::high_resolution_clock::now();
+      std::chrono::duration<double> elapsed = end - start;
+      std::cout << "GPU Time: " << elapsed.count() << " s" << std::endl;
+      
+      //s.copy_from_device();
+      //dump_state(s);  
+    
+    
+      return 0;
 }
