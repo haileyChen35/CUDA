@@ -2,7 +2,6 @@
 #include <fstream>
 #include <random>
 #include <cmath>
-
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 
@@ -155,7 +154,8 @@ void init_solar(simulation& s) {
 
 __global__ void calculateForcesKernel(double* fx, double* fy, double* fz,
                                       double* x, double* y, double* z,
-                                      double* mass, int nbpart) {
+                                      double* mass, int nbpart, double G) {
+
     int i = blockIdx.x * blockDim.x + threadIdx.x;
     if (i >= nbpart) return;
 
@@ -204,7 +204,7 @@ __global__ void updatePositionKernel(double* x, double* y, double* z,
 void calculate_forces(simulation& s) {
     int blockSize = 256;
     int gridSize = (s.nbpart + blockSize - 1) / blockSize;
-    calculateForcesKernel<<<gridSize, blockSize>>>(s.fx, s.fy, s.fz, s.x, s.y, s.z, s.mass, s.nbpart);
+    calculateForcesKernel<<<gridSize, blockSize>>>(s.fx, s.fy, s.fz, s.x, s.y, s.z, s.mass, s.nbpart, G);
     cudaDeviceSynchronize();
 }
 
@@ -295,7 +295,7 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    simulation s(std::stoul(argv[1]));
+    simulation s(0);
     load_from_file(argv[1], s);
     double dt = atof(argv[2]);
     int steps = atoi(argv[3]);
