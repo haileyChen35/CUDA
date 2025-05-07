@@ -2,6 +2,7 @@
 #include <fstream>
 #include <random>
 #include <cmath>
+#include <chrono>
 
 double G = 6.674*std::pow(10,-11);
 //double G = 1;
@@ -39,9 +40,9 @@ struct simulation {
 void random_init(simulation& s) {
   std::random_device rd;  
   std::mt19937 gen(rd());
-  std::uniform_real_distribution dismass(0.9, 1.);
-  std::normal_distribution dispos(0., 1.);
-  std::normal_distribution disvel(0., 1.);
+  std::uniform_real_distribution<double> dismass(0.9, 1.);
+  std::normal_distribution<double> dispos(0., 1.);
+  std::normal_distribution<double> disvel(0., 1.);
 
   for (size_t i = 0; i<s.nbpart; ++i) {
     s.mass[i] = dismass(gen);
@@ -211,10 +212,10 @@ int main(int argc, char* argv[]) {
     }    
   }
 
-  
+  auto start = std::chrono::high_resolution_clock::now();
   for (size_t step = 0; step< nbstep; step++) {
-    if (step %printevery == 0)
-      dump_state(s);
+    /*if (step %printevery == 0)
+      dump_state(s);*/
   
     reset_force(s);
     for (size_t i=0; i<s.nbpart; ++i)
@@ -227,7 +228,9 @@ int main(int argc, char* argv[]) {
       update_position(s, i, dt);
     }
   }
-  
+  auto end = std::chrono::high_resolution_clock::now();
+  std::chrono::duration<double> elapsed = end - start;
+  std::cout << "CPU Time: " << elapsed.count() << " s\n";
   //dump_state(s);  
 
 
