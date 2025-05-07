@@ -192,8 +192,8 @@ void random_init(simulation& s) {
     s.hvy[i] = disvel(gen);
     s.hvz[i] = disvel(gen);
     s.hvz[i] = 0.;
-    s.hvx[i] = s.y[i]*1.5;
-    s.hvy[i] = -s.x[i]*1.5;
+    s.hvx[i] = s.hy[i]*1.5;
+    s.hvy[i] = -s.hx[i]*1.5;
     s.hfx[i] = s.hfy[i] = s.hfz[i] = 0.0;
 
   }
@@ -219,14 +219,28 @@ void init_solar(simulation& s) {
   // Positions (in meters) and velocities (in m/s)
   double AU = 1.496 * std::pow(10, 11); // Astronomical Unit
 
-  s.hx = {0, 0.39*AU, 0.72*AU, 1.0*AU, 1.52*AU, 5.20*AU, 9.58*AU, 19.22*AU, 30.05*AU, 1.0*AU + 3.844*std::pow(10, 8)};
-  s.hy = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-  s.hz = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  s.hx[SUN] = 0; s.hy[SUN] = 0; s.hz[SUN] = 0;
+  s.hx[MERCURY] = 0.39*AU; s.hy[MERCURY] = 0; s.hz[MERCURY] = 0;
+  s.hx[VENUS] = 0.72*AU; s.hy[VENUS] = 0; s.hz[VENUS] = 0;
+  s.hx[EARTH] = 1.0*AU; s.hy[EARTH] = 0; s.hz[EARTH] = 0;
+  s.hx[MARS] = 1.52*AU; s.hy[MARS] = 0; s.hz[MARS] = 0;
+  s.hx[JUPITER] = 5.20*AU; s.hy[JUPITER] = 0; s.hz[JUPITER] = 0;
+  s.hx[SATURN] = 9.58*AU; s.hy[SATURN] = 0; s.hz[SATURN] = 0;
+  s.hx[URANUS] = 19.22*AU; s.hy[URANUS] = 0; s.hz[URANUS] = 0;
+  s.hx[NEPTUNE] = 30.05*AU; s.hy[NEPTUNE] = 0; s.hz[NEPTUNE] = 0;
+  s.hx[MOON] = 1.0*AU + 3.844*std::pow(10, 8); s.hy[MOON] = 0; s.hz[MOON] = 0;
 
-  s.hvx = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-  s.hvy = {0, 47870, 35020, 29780, 24130, 13070, 9680, 6800, 5430, 29780 + 1022};
-  s.hvz = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
+  s.hvx[SUN] = 0; s.hvy[SUN] = 0; s.hvz[SUN] = 0;
+  s.hvx[MERCURY] = 0; s.hvy[MERCURY] = 47870; s.hvz[MERCURY] = 0;
+  s.hvx[VENUS] = 0; s.hvy[VENUS] = 35020; s.hvz[VENUS] = 0;
+  s.hvx[EARTH] = 0; s.hvy[EARTH] = 29780; s.hvz[EARTH] = 0;
+  s.hvx[MARS] = 0; s.hvy[MARS] = 24130; s.hvz[MARS] = 0;
+  s.hvx[JUPITER] = 0; s.hvy[JUPITER] = 13070; s.hvz[JUPITER] = 0;
+  s.hvx[SATURN] = 0; s.hvy[SATURN] = 9680; s.hvz[SATURN] = 0;
+  s.hvx[URANUS] = 0; s.hvy[URANUS] = 6800; s.hvz[URANUS] = 0;
+  s.hvx[NEPTUNE] = 0; s.hvy[NEPTUNE] = 5430; s.hvz[NEPTUNE] = 0;
+  s.hvx[MOON] = 0; s.hvy[MOON] = 29780 + 1022; s.hvz[MOON] = 0;
+  
   for (int i = 0; i < 10; i++) {
     s.hfx[i] = 0;
     s.hfy[i] = 0;
