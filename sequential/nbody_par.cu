@@ -348,14 +348,15 @@ __global__ void compute_forces_kernel(double* dmass, double* dx, double* dy, dou
 
 
 void dump_state(simulation& s) {
-  std::cout<<s.nbpart<<'\t';
-  for (size_t i=0; i<s.nbpart; ++i) {
-    std::cout<<s.hmass[i]<<'\t';
-    std::cout<<s.hx[i]<<'\t'<<s.hy[i]<<'\t'<<s.hz[i]<<'\t';
-    std::cout<<s.hvx[i]<<'\t'<<s.hvy[i]<<'\t'<<s.hvz[i]<<'\t';
-    std::cout<<s.hfx[i]<<'\t'<<s.hfy[i]<<'\t'<<s.hfz[i]<<'\t';
+  s.device_to_host();
+  for (size_t i = 0; i < s.nbpart; ++i) {
+      std::cout << "Particle " << i << ":\n";
+      std::cout << "  Mass: " << s.hmass[i] << " kg\n";
+      std::cout << "  Position: (" << s.hx[i] << ", " << s.hy[i] << ", " << s.hz[i] << ") m\n";
+      std::cout << "  Velocity: (" << s.hvx[i] << ", " << s.hvy[i] << ", " << s.hvz[i] << ") m/s\n";
+      std::cout << "  Force: (" << s.hfx[i] << ", " << s.hfy[i] << ", " << s.hfz[i] << ") N\n";
+      std::cout << std::endl;
   }
-  std::cout<<'\n';
 }
 
 void load_from_file(simulation& s, std::string filename) {
@@ -415,7 +416,6 @@ int main(int argc, char* argv[]) {
   
   for (size_t step = 0; step < nbstep; step++) {
       if (step % printevery == 0) {
-          s.device_to_host();
           dump_state(s);
       }
 
