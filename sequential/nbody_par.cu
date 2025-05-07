@@ -354,20 +354,21 @@ void load_from_file(simulation& s, std::string filename) {
 }
 
 int main(int argc, char* argv[]) {
-  if (argc != 5) {
+  if (argc != 6) {
     std::cerr
       <<"usage: "<<argv[0]<<" <input> <dt> <nbstep> <printevery>"<<"\n"
       <<"input can be:"<<"\n"
       <<"a number (random initialization)"<<"\n"
       <<"planet (initialize with solar system)"<<"\n"
       <<"a filename (load from file in singleline tsv)"<<"\n";
+      <<"block size"<<"\n";
     return -1;
   }
 
   double dt = std::atof(argv[2]); //in seconds
   size_t nbstep = std::atol(argv[3]);
   size_t printevery = std::atol(argv[4]);
-  
+  int blockSize = std::atol(argv[5]);
   
   simulation s(1);
 
@@ -395,7 +396,7 @@ int main(int argc, char* argv[]) {
   
   for (size_t step = 0; step < nbstep; step++) {
       if (step % printevery == 0) {
-          s.device_to_host()
+          s.device_to_host();
           dump_state(s);
       }
 
