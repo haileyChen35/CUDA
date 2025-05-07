@@ -170,7 +170,7 @@ struct simulation {
       }
     
     void host_to_device() {
-        CUDA_CHECK((dmass, hmass, nbpart * sizeof(double), cudaMemcpyHostToDevice));
+        CUDA_CHECK(cudaMemcpy(dmass, hmass, nbpart * sizeof(double), cudaMemcpyHostToDevice));
         CUDA_CHECK(cudaMemcpy(dx, hx, nbpart * sizeof(double), cudaMemcpyHostToDevice));
         CUDA_CHECK(cudaMemcpy(dy, hy, nbpart * sizeof(double), cudaMemcpyHostToDevice));
         CUDA_CHECK(cudaMemcpy(dz, hz, nbpart * sizeof(double), cudaMemcpyHostToDevice));
