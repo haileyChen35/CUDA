@@ -7,4 +7,8 @@
 #SBATCH --gres=gpu:1
 #SBATCH --mem=16G
 
-./nbody 100000 0.01 50 101 128
+OUTPUT="output.txt"
+
+echo "Test Case 0: planet dt=200 steps=5000 print_every=100 block_size=128" >> $OUTPUT
+./nbody planet 200 5000 100 128 >> $OUTPUT
+echo "" >> $OUTPUT
