@@ -11,6 +11,17 @@
 double G = 6.674*std::pow(10,-11);
 //double G = 1;
 
+#define CUDA_CHECK(call)                                                    \
+    do {                                                                    \
+        cudaError_t err = call;                                             \
+        if (err != cudaSuccess) {                                           \
+            std::cerr << "CUDA error in " << __FILE__ << ":" << __LINE__   \
+                      << " - " << cudaGetErrorString(err) << std::endl;    \
+            exit(EXIT_FAILURE);                                             \
+        }                                                                   \
+    } while (0)
+
+
 struct simulation {
   size_t nbpart;
   
@@ -65,16 +76,16 @@ struct simulation {
     hfz = new double[nb]();
 
     //allocate device memory
-    cudaMalloc(&dmass, nb*sizeof(double));
-    cudaMalloc(&dx, nb * sizeof(double));
-    cudaMalloc(&dy, nb * sizeof(double));
-    cudaMalloc(&dz, nb * sizeof(double));
-    cudaMalloc(&dvx, nb * sizeof(double));
-    cudaMalloc(&dvy, nb * sizeof(double));
-    cudaMalloc(&dvz, nb * sizeof(double));
-    cudaMalloc(&dfx, nb * sizeof(double));
-    cudaMalloc(&dfy, nb * sizeof(double));
-    cudaMalloc(&dfz, nb * sizeof(double));
+    CUDA_CHECK(cudaMalloc(&dmass, nb*sizeof(double)));
+    CUDA_CHECK(cudaMalloc(&dx, nb * sizeof(double)));
+    CUDA_CHECK(cudaMalloc(&dy, nb * sizeof(double)));
+    CUDA_CHECK(cudaMalloc(&dz, nb * sizeof(double)));
+    CUDA_CHECK(cudaMalloc(&dvx, nb * sizeof(double)));
+    CUDA_CHECK(cudaMalloc(&dvy, nb * sizeof(double)));
+    CUDA_CHECK(cudaMalloc(&dvz, nb * sizeof(double)));
+    CUDA_CHECK(cudaMalloc(&dfx, nb * sizeof(double)));
+    CUDA_CHECK(cudaMalloc(&dfy, nb * sizeof(double)));
+    CUDA_CHECK(cudaMalloc(&dfz, nb * sizeof(double)));
 
     //initialize memory 
     cudaMemset(dmass, 0, nb * sizeof(double));
@@ -141,16 +152,16 @@ struct simulation {
         hfy = new double[nbpart](); 
         hfz = new double[nbpart]();
     
-        cudaMalloc(&dmass, nbpart * sizeof(double));
-        cudaMalloc(&dx, nbpart * sizeof(double));
-        cudaMalloc(&dy, nbpart * sizeof(double));
-        cudaMalloc(&dz, nbpart * sizeof(double));
-        cudaMalloc(&dvx, nbpart * sizeof(double));
-        cudaMalloc(&dvy, nbpart * sizeof(double));
-        cudaMalloc(&dvz, nbpart * sizeof(double));
-        cudaMalloc(&dfx, nbpart * sizeof(double));
-        cudaMalloc(&dfy, nbpart * sizeof(double));
-        cudaMalloc(&dfz, nbpart * sizeof(double));
+        CUDA_CHECK(cudaMalloc(&dmass, nbpart * sizeof(double)));
+        CUDA_CHECK(cudaMalloc(&dx, nbpart * sizeof(double)));
+        CUDA_CHECK(cudaMalloc(&dy, nbpart * sizeof(double)));
+        CUDA_CHECK(cudaMalloc(&dz, nbpart * sizeof(double)));
+        CUDA_CHECK(cudaMalloc(&dvx, nbpart * sizeof(double)));
+        CUDA_CHECK(cudaMalloc(&dvy, nbpart * sizeof(double)));
+        CUDA_CHECK(cudaMalloc(&dvz, nbpart * sizeof(double)));
+        CUDA_CHECK(cudaMalloc(&dfx, nbpart * sizeof(double)));
+        CUDA_CHECK(cudaMalloc(&dfy, nbpart * sizeof(double)));
+        CUDA_CHECK(cudaMalloc(&dfz, nbpart * sizeof(double)));
     
         cudaMemset(dmass, 0, nbpart * sizeof(double));
         cudaMemset(dx, 0, nbpart * sizeof(double));
@@ -427,7 +438,7 @@ int main(int argc, char* argv[]) {
       std::cerr << "Kernel launch failed: " << cudaGetErrorString(err) << std::endl;
   }
   cudaDeviceSynchronize();
-  
+
   auto end = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> elapsed = end - start;
   std::cout << "GPU Time: " << elapsed.count() << " s" << std::endl;
