@@ -370,7 +370,7 @@ int main(int argc, char* argv[]) {
   size_t printevery = std::atol(argv[4]);
   int blockSize = std::atol(argv[5]);
   
-  simulation s(1);
+  simulation s;
 
   //parse command line
   {

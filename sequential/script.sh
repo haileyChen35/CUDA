@@ -12,15 +12,15 @@ OUTPUT="output.txt"
 echo "Nbody" >> $OUTPUT
 
 echo "Test Case 1:" >> $OUTPUT
-./nbody 1000 5 500 100 256 >> $OUTPUT
+./nbody 1000 5 500 100  >> $OUTPUT
 echo "" >> $OUTPUT
 
 echo "Test Case 2:" >> $OUTPUT
-./nbody 10000 10 500 100 256 >> $OUTPUT
+./nbody 10000 10 500 100  >> $OUTPUT
 echo "" >> $OUTPUT
 
 echo "Test Case 3:" >> $OUTPUT
-./nbody 100000 15 500 100 256 >> $OUTPUT
+./nbody 100000 15 500 100  >> $OUTPUT
 echo "" >> $OUTPUT
 
 echo "Nbody_Par" >> $OUTPUT
