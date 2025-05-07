@@ -349,8 +349,8 @@ void load_from_file(simulation& s, std::string filename) {
     in >> s.hvx[i] >> s.hvy[i] >> s.hvz[i];
     in >> s.hfx[i] >> s.hfy[i] >> s.hfz[i];
   }
-  if (!in.good())
-    throw "kaboom";
+
+  s.host_to_device();
 }
 
 int main(int argc, char* argv[]) {
