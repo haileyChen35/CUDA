@@ -267,7 +267,7 @@ __global__ void update_particles_kernel(double* dx, double* dy, double* dz,
     dz[i] += dvz[i] * dt;
 }
 
-__global__ void reset_force_kernel(simulation& s) {
+__global__ void reset_forces_kernel(simulation& s) {
   int i = blockIdx.x * blockDim.x + threadIdx.x;
   for (size_t i=0; i<s.nbpart; ++i) {
     s.dfx[i] = 0.;
