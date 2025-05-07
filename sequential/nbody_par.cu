@@ -360,7 +360,7 @@ int main(int argc, char* argv[]) {
       <<"input can be:"<<"\n"
       <<"a number (random initialization)"<<"\n"
       <<"planet (initialize with solar system)"<<"\n"
-      <<"a filename (load from file in singleline tsv)"<<"\n";
+      <<"a filename (load from file in singleline tsv)"<<"\n"
       <<"block size"<<"\n";
     return -1;
   }
