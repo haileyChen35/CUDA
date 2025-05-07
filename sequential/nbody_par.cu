@@ -168,6 +168,19 @@ struct simulation {
         cudaMemcpy(dfz, hfz, nbpart * sizeof(double), cudaMemcpyHostToDevice);
     }
 
+    void device_to_host() {
+      cudaMemcpy(hmass, dmass, nbpart * sizeof(double), cudaMemcpyDeviceToHost);
+      cudaMemcpy(hx, dx, nbpart * sizeof(double), cudaMemcpyDeviceToHost);
+      cudaMemcpy(hy, dy, nbpart * sizeof(double), cudaMemcpyDeviceToHost);
+      cudaMemcpy(hz, dz, nbpart * sizeof(double), cudaMemcpyDeviceToHost);
+      cudaMemcpy(hvx, dvx, nbpart * sizeof(double), cudaMemcpyDeviceToHost);
+      cudaMemcpy(hvy, dvy, nbpart * sizeof(double), cudaMemcpyDeviceToHost);
+      cudaMemcpy(hvz, dvz, nbpart * sizeof(double), cudaMemcpyDeviceToHost);
+      cudaMemcpy(hfx, dfx, nbpart * sizeof(double), cudaMemcpyDeviceToHost);
+      cudaMemcpy(hfy, dfy, nbpart * sizeof(double), cudaMemcpyDeviceToHost);
+      cudaMemcpy(hfz, dfz, nbpart * sizeof(double), cudaMemcpyDeviceToHost);
+  }
+
    
 };
 
@@ -267,14 +280,13 @@ __global__ void update_particles_kernel(double* dx, double* dy, double* dz,
     dz[i] += dvz[i] * dt;
 }
 
-__global__ void reset_forces_kernel(simulation& s) {
+__global__ void reset_forces_kernel(double* dfx, double* dfy, double* dfz, size_t nbpart) {
   int i = blockIdx.x * blockDim.x + threadIdx.x;
-  
-  for (size_t i=0; i<s.nbpart; ++i) {
-    s.dfx[i] = 0.;
-    s.dfy[i] = 0.;
-    s.dfz[i] = 0.;
-  }
+  if (i >= nbpart) return;
+
+  dfx[i] = 0.;
+  dfy[i] = 0.;
+  dfz[i] = 0.;
 }
 
 __global__ void compute_forces_kernel(double* dmass, double* dx, double* dy, double* dz, 
@@ -318,10 +330,10 @@ __global__ void compute_forces_kernel(double* dmass, double* dx, double* dy, dou
 void dump_state(simulation& s) {
   std::cout<<s.nbpart<<'\t';
   for (size_t i=0; i<s.nbpart; ++i) {
-    std::cout<<s.dmass[i]<<'\t';
-    std::cout<<s.dx[i]<<'\t'<<s.dy[i]<<'\t'<<s.dz[i]<<'\t';
-    std::cout<<s.dvx[i]<<'\t'<<s.dvy[i]<<'\t'<<s.dvz[i]<<'\t';
-    std::cout<<s.dfx[i]<<'\t'<<s.dfy[i]<<'\t'<<s.dfz[i]<<'\t';
+    std::cout<<s.hmass[i]<<'\t';
+    std::cout<<s.hx[i]<<'\t'<<s.hy[i]<<'\t'<<s.hz[i]<<'\t';
+    std::cout<<s.hvx[i]<<'\t'<<s.hvy[i]<<'\t'<<s.hvz[i]<<'\t';
+    std::cout<<s.hfx[i]<<'\t'<<s.hfy[i]<<'\t'<<s.hfz[i]<<'\t';
   }
   std::cout<<'\n';
 }
@@ -383,10 +395,11 @@ int main(int argc, char* argv[]) {
   
   for (size_t step = 0; step < nbstep; step++) {
       if (step % printevery == 0) {
+          s.device_to_host()
           dump_state(s);
       }
 
-      reset_forces_kernel<<<numBlocks, blockSize>>>(s);
+      reset_forces_kernel<<<blocks, threads>>>(s.dfx, s.dfy, s.dfz, s.nbpart);
       
       // Compute forces on device
       compute_forces_kernel<<<numBlocks, blockSize>>>(s.dmass, s.dx, s.dy, s.dz, 
