@@ -240,7 +240,7 @@ void init_solar(simulation& s) {
   s.hvx[URANUS] = 0; s.hvy[URANUS] = 6800; s.hvz[URANUS] = 0;
   s.hvx[NEPTUNE] = 0; s.hvy[NEPTUNE] = 5430; s.hvz[NEPTUNE] = 0;
   s.hvx[MOON] = 0; s.hvy[MOON] = 29780 + 1022; s.hvz[MOON] = 0;
-  
+
   for (int i = 0; i < 10; i++) {
     s.hfx[i] = 0;
     s.hfy[i] = 0;
@@ -267,7 +267,7 @@ __global__ void update_particles_kernel(double* dx, double* dy, double* dz,
     dz[i] += dvz[i] * dt;
 }
 
-__global__ void reset_force(simulation& s) {
+__global__ void reset_force_kernel(simulation& s) {
   int i = blockIdx.x * blockDim.x + threadIdx.x;
   for (size_t i=0; i<s.nbpart; ++i) {
     s.dfx[i] = 0.;
@@ -291,21 +291,21 @@ __global__ void compute_forces_kernel(double* dmass, double* dx, double* dy, dou
     double my_fz = 0.0;
 
     for (int j = 0; j < nbpart; j++) {
-    if (i == j) continue;
+        if (i == j) continue;
 
-    double dx = dx[j] - my_x;
-    double dy = dy[j] - my_y;
-    double dz = dz[j] - my_z;
+        double delta_x = dx[j] - my_x;
+        double delta_y = dy[j] - my_y;
+        double delta_z = dz[j] - my_z;
 
-    double dist_sq = dx*dx + dy*dy + dz*dz + softening;
-    double inv_dist = rsqrt(dist_sq);
-    double inv_dist3 = inv_dist * inv_dist * inv_dist;
+        double dist_sq = delta_x*delta_x + delta_y*delta_y + delta_z*delta_z + softening;
+        double inv_dist = rsqrt(dist_sq);
+        double inv_dist3 = inv_dist * inv_dist * inv_dist;
 
-    double F = G * dmass[i] * dmass[j] * inv_dist3;
+        double F = G * dmass[i] * dmass[j] * inv_dist3;
 
-    my_fx += F * dx;
-    my_fy += F * dy;
-    my_fz += F * dz;
+        my_fx += F * delta_x;
+        my_fy += F * delta_y;
+        my_fz += F * delta_z;
     }
 
     dfx[i] = my_fx;
@@ -331,7 +331,7 @@ void load_from_file(simulation& s, std::string filename) {
   in>>nbpart;
   s = simulation(nbpart);
   for (size_t i=0; i<s.nbpart; ++i) {
-    in>>s.mass[i];
+    in>>s.hmass[i];
     in >> s.hx[i] >>  s.hy[i] >>  s.hz[i];
     in >> s.hvx[i] >> s.hvy[i] >> s.hvz[i];
     in >> s.hfx[i] >> s.hfy[i] >> s.hfz[i];
