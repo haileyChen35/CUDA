@@ -5,7 +5,7 @@
 #include <chrono>
 
 double G = 6.674*std::pow(10,-11);
-//double G = 1;
+
 
 struct simulation {
   size_t nbpart;
@@ -61,7 +61,6 @@ void random_init(simulation& s) {
   }
 
   return;
-  //normalize velocity (using normalization found on some physicis blog)
   double meanmass = 0;
   double meanmassvx = 0;
   double meanmassvy = 0;
@@ -84,7 +83,7 @@ void init_solar(simulation& s) {
   enum Planets {SUN, MERCURY, VENUS, EARTH, MARS, JUPITER, SATURN, URANUS, NEPTUNE, MOON};
   s = simulation(10);
 
-  // Masses in kg
+
   s.mass[SUN] = 1.9891 * std::pow(10, 30);
   s.mass[MERCURY] = 3.285 * std::pow(10, 23);
   s.mass[VENUS] = 4.867 * std::pow(10, 24);
@@ -96,8 +95,8 @@ void init_solar(simulation& s) {
   s.mass[NEPTUNE] = 1.024 * std::pow(10, 26);
   s.mass[MOON] = 7.342 * std::pow(10, 22);
 
-  // Positions (in meters) and velocities (in m/s)
-  double AU = 1.496 * std::pow(10, 11); // Astronomical Unit
+
+  double AU = 1.496 * std::pow(10, 11); 
 
   s.x = {0, 0.39*AU, 0.72*AU, 1.0*AU, 1.52*AU, 5.20*AU, 9.58*AU, 19.22*AU, 30.05*AU, 1.0*AU + 3.844*std::pow(10, 8)};
   s.y = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -108,15 +107,15 @@ void init_solar(simulation& s) {
   s.vz = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 }
 
-//meant to update the force that from applies on to
+
 void update_force(simulation& s, size_t from, size_t to) {
   double softening = .1;
   double dist_sq = std::pow(s.x[from]-s.x[to],2)
     + std::pow(s.y[from]-s.y[to],2)
     + std::pow(s.z[from]-s.z[to],2);
-  double F = G * s.mass[from]*s.mass[to]/(dist_sq+softening); //that the strength of the force
+  double F = G * s.mass[from]*s.mass[to]/(dist_sq+softening); 
 
-  //direction
+
   double dx = s.x[from]-s.x[to];
   double dy = s.y[from]-s.y[to];
   double dz = s.z[from]-s.z[to];
@@ -126,7 +125,7 @@ void update_force(simulation& s, size_t from, size_t to) {
   dy = dy/norm;
   dz = dz/norm;
 
-  //apply force
+
   s.fx[to] += dx*F;
   s.fy[to] += dy*F;
   s.fz[to] += dz*F;
@@ -189,7 +188,7 @@ int main(int argc, char* argv[]) {
     return -1;
   }
   
-  double dt = std::atof(argv[2]); //in seconds
+  double dt = std::atof(argv[2]); 
   size_t nbstep = std::atol(argv[3]);
   size_t printevery = std::atol(argv[4]);
   
@@ -214,9 +213,7 @@ int main(int argc, char* argv[]) {
 
   auto start = std::chrono::high_resolution_clock::now();
   for (size_t step = 0; step< nbstep; step++) {
-    /*if (step %printevery == 0)
-      dump_state(s);*/
-  
+
     reset_force(s);
     for (size_t i=0; i<s.nbpart; ++i)
       for (size_t j=0; j<s.nbpart; ++j)
@@ -231,7 +228,7 @@ int main(int argc, char* argv[]) {
   auto end = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> elapsed = end - start;
   std::cout << "CPU Time: " << elapsed.count() << " s\n";
-  //dump_state(s);  
+
 
 
   return 0;
