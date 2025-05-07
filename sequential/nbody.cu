@@ -87,6 +87,8 @@ struct simulation {
     cudaMemset(dfx, 0, nb * sizeof(double));
     cudaMemset(dfy, 0, nb * sizeof(double));
 
+  }
+
     //release memory
     ~simulation(){
         delete[] hmass;
@@ -113,51 +115,46 @@ struct simulation {
 
     }
 
-  }
-   
-};
-
-  void resize(size_t new_nbpart) {
-    if (new_nbpart == nbpart) return;
-
-    this->~simulation();
-
-    nbpart = new_nbpart;
-    hmass = new double[nbpart]();
-    hx = new double[nbpart](); 
-    hy = new double[nbpart](); 
-    hz = new double[nbpart]();
-    hvx = new double[nbpart](); 
-    hvy = new double[nbpart](); 
-    hvz = new double[nbpart]();
-    hfx = new double[nbpart](); 
-    hfy = new double[nbpart](); 
-    hfz = new double[nbpart]();
-
-    cudaMalloc(&dmass, nbpart * sizeof(double));
-    cudaMalloc(&dx, nbpart * sizeof(double));
-    cudaMalloc(&dy, nbpart * sizeof(double));
-    cudaMalloc(&dz, nbpart * sizeof(double));
-    cudaMalloc(&dvx, nbpart * sizeof(double));
-    cudaMalloc(&dvy, nbpart * sizeof(double));
-    cudaMalloc(&dvz, nbpart * sizeof(double));
-    cudaMalloc(&dfx, nbpart * sizeof(double));
-    cudaMalloc(&dfy, nbpart * sizeof(double));
-    cudaMalloc(&dfz, nbpart * sizeof(double));
-
-    cudaMemset(dmass, 0, nbpart * sizeof(double));
-    cudaMemset(dx, 0, nbpart * sizeof(double));
-    cudaMemset(dy, 0, nbpart * sizeof(double));
-    cudaMemset(dz, 0, nbpart * sizeof(double));
-    cudaMemset(dvx, 0, nbpart * sizeof(double));
-    cudaMemset(dvy, 0, nbpart * sizeof(double));
-    cudaMemset(dvz, 0, nbpart * sizeof(double));
-    cudaMemset(dfx, 0, nbpart * sizeof(double));
-    cudaMemset(dfy, 0, nbpart * sizeof(double));
-    cudaMemset(dfz, 0, nbpart * sizeof(double));
-  }
-
-
+    void resize(size_t new_nbpart) {
+        if (new_nbpart == nbpart) return;
+    
+        this->~simulation();
+    
+        nbpart = new_nbpart;
+        hmass = new double[nbpart]();
+        hx = new double[nbpart](); 
+        hy = new double[nbpart](); 
+        hz = new double[nbpart]();
+        hvx = new double[nbpart](); 
+        hvy = new double[nbpart](); 
+        hvz = new double[nbpart]();
+        hfx = new double[nbpart](); 
+        hfy = new double[nbpart](); 
+        hfz = new double[nbpart]();
+    
+        cudaMalloc(&dmass, nbpart * sizeof(double));
+        cudaMalloc(&dx, nbpart * sizeof(double));
+        cudaMalloc(&dy, nbpart * sizeof(double));
+        cudaMalloc(&dz, nbpart * sizeof(double));
+        cudaMalloc(&dvx, nbpart * sizeof(double));
+        cudaMalloc(&dvy, nbpart * sizeof(double));
+        cudaMalloc(&dvz, nbpart * sizeof(double));
+        cudaMalloc(&dfx, nbpart * sizeof(double));
+        cudaMalloc(&dfy, nbpart * sizeof(double));
+        cudaMalloc(&dfz, nbpart * sizeof(double));
+    
+        cudaMemset(dmass, 0, nbpart * sizeof(double));
+        cudaMemset(dx, 0, nbpart * sizeof(double));
+        cudaMemset(dy, 0, nbpart * sizeof(double));
+        cudaMemset(dz, 0, nbpart * sizeof(double));
+        cudaMemset(dvx, 0, nbpart * sizeof(double));
+        cudaMemset(dvy, 0, nbpart * sizeof(double));
+        cudaMemset(dvz, 0, nbpart * sizeof(double));
+        cudaMemset(dfx, 0, nbpart * sizeof(double));
+        cudaMemset(dfy, 0, nbpart * sizeof(double));
+        cudaMemset(dfz, 0, nbpart * sizeof(double));
+      }
+    
     void host_to_device() {
         cudaMemcpy(dmass, hmass, nbpart * sizeof(double), cudaMemcpyHostToDevice);
         cudaMemcpy(dx, hx, nbpart * sizeof(double), cudaMemcpyHostToDevice);
@@ -169,7 +166,11 @@ struct simulation {
         cudaMemcpy(dfx, hfx, nbpart * sizeof(double), cudaMemcpyHostToDevice);
         cudaMemcpy(dfy, hfy, nbpart * sizeof(double), cudaMemcpyHostToDevice);
         cudaMemcpy(dfz, hfz, nbpart * sizeof(double), cudaMemcpyHostToDevice);
-      }
+    }
+
+   
+};
+
 
 
 void random_init(simulation& s) {
