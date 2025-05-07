@@ -7,11 +7,11 @@ Nbody_Par = nbody_par
 
 all: $(Nbody) $(Nbody_Par)
 
-$(Nbody_Par): nbody_gpu.cu
-	$(NVCC) $(CXXFLAGS) $< -o $@
-
-$(Nbody): nbody_cpu.cpp
+$(Nbody): nbody.cpp
 	$(CXX) $(CXXFLAGS) $< -o $@
+	
+$(Nbody_Par): nbody_par.cu
+	$(NVCC) $(CXXFLAGS) $< -o $@
 
 clean:
 	rm -f $(Nbody) $(Nbody_Par) *.out
