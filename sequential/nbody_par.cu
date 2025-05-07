@@ -389,7 +389,6 @@ int main(int argc, char* argv[]) {
   }
 
   
-  int blockSize = 256; 
   int numBlocks = (s.nbpart + blockSize - 1) / blockSize;
 
   auto start = std::chrono::high_resolution_clock::now();
@@ -400,7 +399,7 @@ int main(int argc, char* argv[]) {
           dump_state(s);
       }
 
-      reset_forces_kernel<<<blocks, threads>>>(s.dfx, s.dfy, s.dfz, s.nbpart);
+      reset_forces_kernel<<<numBlocks, blockSize>>>(s.dfx, s.dfy, s.dfz, s.nbpart);
       
       // Compute forces on device
       compute_forces_kernel<<<numBlocks, blockSize>>>(s.dmass, s.dx, s.dy, s.dz, 
