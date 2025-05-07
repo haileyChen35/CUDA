@@ -269,7 +269,6 @@ __global__ void update_particles_kernel(double* dx, double* dy, double* dz,
 
 __global__ void reset_forces_kernel(simulation& s) {
   int i = blockIdx.x * blockDim.x + threadIdx.x;
-  if (i >= nbpart) return;
   
   for (size_t i=0; i<s.nbpart; ++i) {
     s.dfx[i] = 0.;
