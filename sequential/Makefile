@@ -1,17 +1,17 @@
 CXXFLAGS=-O3
+NVCC = nvcc
+CXXFLAGS = -O3 -std=c++11
 
-nbody: nbody.cu
-	nvcc -O3 nbody.cu -o nbody
+Nbody = nbody
+Nbody_Par = nbody_par
 
-solar.out: nbody
-	date
-	./nbody planet 200 5000000 10000 > solar.out # maybe a minutes
-	date
+all: $(Nbody) $(Nbody_Par)
 
-solar.pdf: solar.out
-	python3 plot.py solar.out solar.pdf 1000 
+$(Nbody_Par): nbody_gpu.cu
+	$(NVCC) $(CXXFLAGS) $< -o $@
 
-random.out: nbody
-	date
-	./nbody 1000 1 10000 100 > random.out # maybe 5 minutes
-	date
+$(Nbody): nbody_cpu.cpp
+	$(CXX) $(CXXFLAGS) $< -o $@
+
+clean:
+	rm -f $(Nbody) $(Nbody_Par) *.out

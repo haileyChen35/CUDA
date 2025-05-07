@@ -9,6 +9,30 @@
 
 OUTPUT="output.txt"
 
-echo "Test Case 0: planet dt=200 steps=5000 print_every=100 block_size=128" >> $OUTPUT
-./nbody planet 200 5000 100 128 >> $OUTPUT
+echo "Nbody" >> $OUTPUT
+
+echo "Test Case 1:" >> $OUTPUT
+./nbody 1000 5 500 100 269 >> $OUTPUT
+echo "" >> $OUTPUT
+
+echo "Test Case 2:" >> $OUTPUT
+./nbody 10000 10 500 100 269 >> $OUTPUT
+echo "" >> $OUTPUT
+
+echo "Test Case 3:" >> $OUTPUT
+./nbody 100000 15 500 100 269 >> $OUTPUT
+echo "" >> $OUTPUT
+
+echo "Nbody_Par" >> $OUTPUT
+
+echo "Test Case 1:" >> $OUTPUT
+./nbody_par 1000 5 500 100 269 >> $OUTPUT
+echo "" >> $OUTPUT
+
+echo "Test Case 2:" >> $OUTPUT
+./nbody_par 10000 10 500 100 269 >> $OUTPUT
+echo "" >> $OUTPUT
+
+echo "Test Case 3:" >> $OUTPUT
+./nbody_par 100000 15 500 100 269 >> $OUTPUT
 echo "" >> $OUTPUT
