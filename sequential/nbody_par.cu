@@ -115,10 +115,19 @@ struct simulation {
 
     }
 
+    void release() {
+      delete[] hmass; delete[] hx; delete[] hy; delete[] hz;
+      delete[] hvx; delete[] hvy; delete[] hvz;
+      delete[] hfx; delete[] hfy; delete[] hfz;
+      cudaFree(dmass); cudaFree(dx); cudaFree(dy); cudaFree(dz);
+      cudaFree(dvx); cudaFree(dvy); cudaFree(dvz);
+      cudaFree(dfx); cudaFree(dfy); cudaFree(dfz);
+  }
+
     void resize(size_t new_nbpart) {
         if (new_nbpart == nbpart) return;
     
-        this->~simulation();
+        release();
     
         nbpart = new_nbpart;
         hmass = new double[nbpart]();
@@ -413,6 +422,11 @@ int main(int argc, char* argv[]) {
                                                        s.dmass, s.nbpart, dt);
       
   }
+  cudaError_t err = cudaGetLastError();
+  if (err != cudaSuccess) {
+      std::cerr << "Kernel launch failed: " << cudaGetErrorString(err) << std::endl;
+  }
+  cudaDeviceSynchronize();
   
   auto end = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> elapsed = end - start;
