@@ -88,15 +88,15 @@ struct simulation {
     CUDA_CHECK(cudaMalloc(&dfz, nb * sizeof(double)));
 
     //initialize memory 
-    cudaMemset(dmass, 0, nb * sizeof(double));
-    cudaMemset(dx, 0, nb * sizeof(double));
-    cudaMemset(dy, 0, nb * sizeof(double));
-    cudaMemset(dz, 0, nb * sizeof(double));
-    cudaMemset(dvx, 0, nb * sizeof(double));
-    cudaMemset(dvy, 0, nb * sizeof(double));
-    cudaMemset(dvz, 0, nb * sizeof(double));
-    cudaMemset(dfx, 0, nb * sizeof(double));
-    cudaMemset(dfy, 0, nb * sizeof(double));
+    // cudaMemset(dmass, 0, nb * sizeof(double));
+    // cudaMemset(dx, 0, nb * sizeof(double));
+    // cudaMemset(dy, 0, nb * sizeof(double));
+    // cudaMemset(dz, 0, nb * sizeof(double));
+    // cudaMemset(dvx, 0, nb * sizeof(double));
+    // cudaMemset(dvy, 0, nb * sizeof(double));
+    // cudaMemset(dvz, 0, nb * sizeof(double));
+    // cudaMemset(dfx, 0, nb * sizeof(double));
+    // cudaMemset(dfy, 0, nb * sizeof(double));
 
   }
 
@@ -126,19 +126,13 @@ struct simulation {
 
     }
 
-    void release() {
-      delete[] hmass; delete[] hx; delete[] hy; delete[] hz;
-      delete[] hvx; delete[] hvy; delete[] hvz;
-      delete[] hfx; delete[] hfy; delete[] hfz;
-      cudaFree(dmass); cudaFree(dx); cudaFree(dy); cudaFree(dz);
-      cudaFree(dvx); cudaFree(dvy); cudaFree(dvz);
-      cudaFree(dfx); cudaFree(dfy); cudaFree(dfz);
-  }
+
 
     void resize(size_t new_nbpart) {
         if (new_nbpart == nbpart) return;
     
-        release();
+        this->~simulation();  // Call destructor manually
+        new (this) simulation(new_nbpart); 
     
         nbpart = new_nbpart;
         hmass = new double[nbpart]();
@@ -163,42 +157,42 @@ struct simulation {
         CUDA_CHECK(cudaMalloc(&dfy, nbpart * sizeof(double)));
         CUDA_CHECK(cudaMalloc(&dfz, nbpart * sizeof(double)));
     
-        cudaMemset(dmass, 0, nbpart * sizeof(double));
-        cudaMemset(dx, 0, nbpart * sizeof(double));
-        cudaMemset(dy, 0, nbpart * sizeof(double));
-        cudaMemset(dz, 0, nbpart * sizeof(double));
-        cudaMemset(dvx, 0, nbpart * sizeof(double));
-        cudaMemset(dvy, 0, nbpart * sizeof(double));
-        cudaMemset(dvz, 0, nbpart * sizeof(double));
-        cudaMemset(dfx, 0, nbpart * sizeof(double));
-        cudaMemset(dfy, 0, nbpart * sizeof(double));
-        cudaMemset(dfz, 0, nbpart * sizeof(double));
+        // cudaMemset(dmass, 0, nbpart * sizeof(double));
+        // cudaMemset(dx, 0, nbpart * sizeof(double));
+        // cudaMemset(dy, 0, nbpart * sizeof(double));
+        // cudaMemset(dz, 0, nbpart * sizeof(double));
+        // cudaMemset(dvx, 0, nbpart * sizeof(double));
+        // cudaMemset(dvy, 0, nbpart * sizeof(double));
+        // cudaMemset(dvz, 0, nbpart * sizeof(double));
+        // cudaMemset(dfx, 0, nbpart * sizeof(double));
+        // cudaMemset(dfy, 0, nbpart * sizeof(double));
+        // cudaMemset(dfz, 0, nbpart * sizeof(double));
       }
     
     void host_to_device() {
-        cudaMemcpy(dmass, hmass, nbpart * sizeof(double), cudaMemcpyHostToDevice);
-        cudaMemcpy(dx, hx, nbpart * sizeof(double), cudaMemcpyHostToDevice);
-        cudaMemcpy(dy, hy, nbpart * sizeof(double), cudaMemcpyHostToDevice);
-        cudaMemcpy(dz, hz, nbpart * sizeof(double), cudaMemcpyHostToDevice);
-        cudaMemcpy(dvx, hvx, nbpart * sizeof(double), cudaMemcpyHostToDevice);
-        cudaMemcpy(dvy, hvy, nbpart * sizeof(double), cudaMemcpyHostToDevice);
-        cudaMemcpy(dvz, hvz, nbpart * sizeof(double), cudaMemcpyHostToDevice);
-        cudaMemcpy(dfx, hfx, nbpart * sizeof(double), cudaMemcpyHostToDevice);
-        cudaMemcpy(dfy, hfy, nbpart * sizeof(double), cudaMemcpyHostToDevice);
-        cudaMemcpy(dfz, hfz, nbpart * sizeof(double), cudaMemcpyHostToDevice);
+        CUDA_CHECK((dmass, hmass, nbpart * sizeof(double), cudaMemcpyHostToDevice));
+        CUDA_CHECK(cudaMemcpy(dx, hx, nbpart * sizeof(double), cudaMemcpyHostToDevice));
+        CUDA_CHECK(cudaMemcpy(dy, hy, nbpart * sizeof(double), cudaMemcpyHostToDevice));
+        CUDA_CHECK(cudaMemcpy(dz, hz, nbpart * sizeof(double), cudaMemcpyHostToDevice));
+        CUDA_CHECK(cudaMemcpy(dvx, hvx, nbpart * sizeof(double), cudaMemcpyHostToDevice));
+        CUDA_CHECK(cudaMemcpy(dvy, hvy, nbpart * sizeof(double), cudaMemcpyHostToDevice));
+        CUDA_CHECK(cudaMemcpy(dvz, hvz, nbpart * sizeof(double), cudaMemcpyHostToDevice));
+        CUDA_CHECK(cudaMemcpy(dfx, hfx, nbpart * sizeof(double), cudaMemcpyHostToDevice));
+        CUDA_CHECK(cudaMemcpy(dfy, hfy, nbpart * sizeof(double), cudaMemcpyHostToDevice));
+        CUDA_CHECK(cudaMemcpy(dfz, hfz, nbpart * sizeof(double), cudaMemcpyHostToDevice));
     }
 
     void device_to_host() {
-      cudaMemcpy(hmass, dmass, nbpart * sizeof(double), cudaMemcpyDeviceToHost);
-      cudaMemcpy(hx, dx, nbpart * sizeof(double), cudaMemcpyDeviceToHost);
-      cudaMemcpy(hy, dy, nbpart * sizeof(double), cudaMemcpyDeviceToHost);
-      cudaMemcpy(hz, dz, nbpart * sizeof(double), cudaMemcpyDeviceToHost);
-      cudaMemcpy(hvx, dvx, nbpart * sizeof(double), cudaMemcpyDeviceToHost);
-      cudaMemcpy(hvy, dvy, nbpart * sizeof(double), cudaMemcpyDeviceToHost);
-      cudaMemcpy(hvz, dvz, nbpart * sizeof(double), cudaMemcpyDeviceToHost);
-      cudaMemcpy(hfx, dfx, nbpart * sizeof(double), cudaMemcpyDeviceToHost);
-      cudaMemcpy(hfy, dfy, nbpart * sizeof(double), cudaMemcpyDeviceToHost);
-      cudaMemcpy(hfz, dfz, nbpart * sizeof(double), cudaMemcpyDeviceToHost);
+      CUDA_CHECK(cudaMemcpy(hmass, dmass, nbpart * sizeof(double), cudaMemcpyDeviceToHost));
+      CUDA_CHECK(cudaMemcpy(hx, dx, nbpart * sizeof(double), cudaMemcpyDeviceToHost));
+      CUDA_CHECK(cudaMemcpy(hy, dy, nbpart * sizeof(double), cudaMemcpyDeviceToHost));
+      CUDA_CHECK(cudaMemcpy(hz, dz, nbpart * sizeof(double), cudaMemcpyDeviceToHost);
+      CUDA_CHECK(cudaMemcpy(hvx, dvx, nbpart * sizeof(double), cudaMemcpyDeviceToHost)));
+      CUDA_CHECK(cudaMemcpy(hvy, dvy, nbpart * sizeof(double), cudaMemcpyDeviceToHost));
+      CUDA_CHECK(cudaMemcpy(hvz, dvz, nbpart * sizeof(double), cudaMemcpyDeviceToHost));
+      CUDA_CHECK(cudaMemcpy(hfx, dfx, nbpart * sizeof(double), cudaMemcpyDeviceToHost));
+      CUDA_CHECK(cudaMemcpy(hfy, dfy, nbpart * sizeof(double), cudaMemcpyDeviceToHost));
+      CUDA_CHECK(cudaMemcpy(hfz, dfz, nbpart * sizeof(double), cudaMemcpyDeviceToHost));
   }
 
    
