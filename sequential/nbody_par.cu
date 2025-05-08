@@ -108,7 +108,7 @@ struct simulation {
     void resize(size_t new_nbpart) {
         if (new_nbpart == nbpart) return;
 
-        this->~simulation();
+        freeMemory(this);
 
         nbpart = new_nbpart;
         hmass = new double[nbpart]();
