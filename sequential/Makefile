@@ -1,22 +1,9 @@
 CXXFLAGS=-O3
-NVCC = nvcc
-CXX := g++
 
+nbody: nbody_par.cpp
+	nvcc -O3 nbody.cpp -o nbody
 
-# Targets
-EXECUTABLES := nbody nbody_par
-
-# Default target
-all: $(EXECUTABLES)
-
-# Serial version
-nbody: nbody.cpp
-	$(CXX) $(CXXFLAGS) $< -o $@
-
-# Parallel CUDA version
-nbody_par: nbody_par.cu
-	$(NVCC) $(CXXFLAGS) $< -o $@
-
-# Cleanup
-clean:
-	rm -f $(EXECUTABLES) *.o *.out core* *.err *.log
+solar.out: nbody_par
+	date
+	./nbody_par 1000 0.1 500 100 256 
+	date
