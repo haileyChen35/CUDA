@@ -12,3 +12,5 @@ OUTPUT="output.txt"
 
 
 ./nbody_par 1000 0.1 500 100 256 >> $OUTPUT
+./nbody_par 10000 0.1 500 100 256 >> $OUTPUT
+./nbody_par 100000 0.1 500 100 256 >> $OUTPUT
