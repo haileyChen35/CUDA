@@ -105,34 +105,34 @@ struct simulation {
 
     }
 
-    void freeMemory(simulation& s){
-      delete[] s.hmass; 
-      delete[] s.hx;  
-      delete[] s.hy; 
-      delete[] s.hz; 
-      delete[] s.hvx;  
-      delete[] s.hvy; 
-      delete[] s.hvz; 
-      delete[] s.hfx; 
-      delete[] s.hfy;  
-      delete[] s.hfz; 
+    // void freeMemory(simulation& s){
+    //   delete[] s.hmass; 
+    //   delete[] s.hx;  
+    //   delete[] s.hy; 
+    //   delete[] s.hz; 
+    //   delete[] s.hvx;  
+    //   delete[] s.hvy; 
+    //   delete[] s.hvz; 
+    //   delete[] s.hfx; 
+    //   delete[] s.hfy;  
+    //   delete[] s.hfz; 
     
-      cudaFree(s.dmass); 
-      cudaFree(s.dx); 
-      cudaFree(s.dy); 
-      cudaFree(s.dz); 
-      cudaFree(s.dvx); 
-      cudaFree(s.dvy); 
-      cudaFree(s.dvz); 
-      cudaFree(s.dfx); 
-      cudaFree(s.dfy); 
-      cudaFree(s.dfz); 
-    }
+    //   cudaFree(s.dmass); 
+    //   cudaFree(s.dx); 
+    //   cudaFree(s.dy); 
+    //   cudaFree(s.dz); 
+    //   cudaFree(s.dvx); 
+    //   cudaFree(s.dvy); 
+    //   cudaFree(s.dvz); 
+    //   cudaFree(s.dfx); 
+    //   cudaFree(s.dfy); 
+    //   cudaFree(s.dfz); 
+    // }
 
     void resize(size_t new_nbpart) {
         if (new_nbpart == nbpart) return;
 
-        freeMemory(this);
+        new (this) simulation(new_nbpart);
 
         nbpart = new_nbpart;
         hmass = new double[nbpart]();
@@ -429,7 +429,7 @@ int main(int argc, char* argv[]) {
   }
 
   auto end = std::chrono::high_resolution_clock::now();
-  freeMemory(s);
+  // freeMemory(s);
   std::chrono::duration<double> elapsed = end - start;
   std::cout << "GPU Time: " << elapsed.count() << " s" << std::endl;
 }
