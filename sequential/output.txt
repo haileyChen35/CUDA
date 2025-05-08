@@ -1,0 +1,20 @@
+Nbody
+Test Case 1:
+CPU Time: 1.25631 s
+
+Test Case 2:
+CPU Time: 152.347 s
+
+Test Case 3: 
+CPU Time: 30.6274 s
+
+Nbody_Par
+Test Case 1:
+GPU Time: 0.120228 s
+
+Test Case 2: 
+GPU Time: 1.20802 s
+
+Test Case 3: 
+GPU Time: 53.3268 s
+

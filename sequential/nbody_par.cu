@@ -76,12 +76,21 @@ struct simulation {
     cudaMalloc(&dfy, nb * sizeof(double));
     cudaMalloc(&dfz, nb * sizeof(double));
 
+    //initialize memory 
+    cudaMemset(dmass, 0, nb * sizeof(double));
+    cudaMemset(dx, 0, nb * sizeof(double));
+    cudaMemset(dy, 0, nb * sizeof(double));
+    cudaMemset(dz, 0, nb * sizeof(double));
+    cudaMemset(dvx, 0, nb * sizeof(double));
+    cudaMemset(dvy, 0, nb * sizeof(double));
+    cudaMemset(dvz, 0, nb * sizeof(double));
+    cudaMemset(dfx, 0, nb * sizeof(double));
+    cudaMemset(dfy, 0, nb * sizeof(double));
 
   }
 
     //release memory
     ~simulation(){
-
         delete[] hmass;
         delete[] hx; 
         delete[] hy; 
@@ -105,8 +114,6 @@ struct simulation {
         cudaFree(dfz);
 
     }
-
-  
 
     void host_to_device() {
         cudaMemcpy(dmass, hmass, nbpart * sizeof(double), cudaMemcpyHostToDevice);
@@ -136,7 +143,6 @@ struct simulation {
 
 
 };
-
 
 
 
@@ -300,12 +306,12 @@ void load_from_file(simulation& s, std::string filename) {
 int main(int argc, char* argv[]) {
   if (argc != 6) {
     std::cerr
-      <<"usage: "<<argv[0]<<" <input> <dt> <nbstep> <printevery>"<<"\n"
+      <<"usage: "<<argv[0]<<" <input> <dt> <nbstep> <printevery> <blockSize>"<<"\n"
       <<"input can be:"<<"\n"
       <<"a number (random initialization)"<<"\n"
       <<"planet (initialize with solar system)"<<"\n"
-      <<"a filename (load from file in singleline tsv)"<<"\n"
-      <<"block size"<<"\n";
+      <<"a filename (load from file in singleline tsv)"<<"\n";
+
     return -1;
   }
 
@@ -314,27 +320,26 @@ int main(int argc, char* argv[]) {
   size_t printevery = std::atol(argv[4]);
   int blockSize = std::atol(argv[5]);
 
-  simulation* s = nullptr;
-
+  simulation s(1);
 
   //parse command line
-  
+  {
     size_t nbpart = std::atol(argv[1]); //return 0 if not a number
     if ( nbpart > 0) {
-      s = new simulation(nbpart);
-      random_init(*s);
+      s = simulation(nbpart);
+      random_init(s);
     } else {
       std::string inputparam = argv[1];
       if (inputparam == "planet") {
-        s = new simulation(10); // will be overwritten in init_solar, so redundant
-        init_solar(*s);
-      } else {
-        load_from_file(*s, inputparam);
+	init_solar(s);
+      } else{
+	load_from_file(s, inputparam);
       }
-    }
-  
+    }    
+  }
 
-    int numBlocks = (s->nbpart + blockSize - 1) / blockSize;
+
+  int numBlocks = (s.nbpart + blockSize - 1) / blockSize;
 
   auto start = std::chrono::high_resolution_clock::now();
 
@@ -354,13 +359,9 @@ int main(int argc, char* argv[]) {
                                                        s.dfx, s.dfy, s.dfz,
                                                        s.dmass, s.nbpart, dt);
 
-       cudaDeviceSynchronize();
-
   }
 
   auto end = std::chrono::high_resolution_clock::now();
-
   std::chrono::duration<double> elapsed = end - start;
   std::cout << "GPU Time: " << elapsed.count() << " s" << std::endl;
-  delete s;
 }

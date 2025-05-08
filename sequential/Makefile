@@ -1,7 +1,17 @@
 CXXFLAGS=-O3
+NVCC = nvcc
+CXX = g++
 
-nbody: nbody_par.cu
-	nvcc -O3 nbody_par.cu -o nbody_par
+Nbody = nbody
+Nbody_Par = nbody_par
 
-clean: 
-	rm nbody_par *.out
+all: $(Nbody) $(Nbody_Par)
+
+$(Nbody): nbody.cpp
+	$(CXX) $(CXXFLAGS) $< -o $@
+	
+$(Nbody_Par): nbody_par.cu
+	$(NVCC) $(CXXFLAGS) $< -o $@
+
+clean:
+	rm -f $(Nbody) $(Nbody_Par) *.out
