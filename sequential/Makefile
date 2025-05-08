@@ -1,6 +1,6 @@
 CXXFLAGS=-O3
 
-nbody: nbody_par.cpp
+nbody: nbody_par.cu
 	nvcc -O3 nbody.cpp -o nbody
 
 solar.out: nbody_par
