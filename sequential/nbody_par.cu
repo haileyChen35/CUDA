@@ -131,8 +131,16 @@ struct simulation {
     void resize(size_t new_nbpart) {
         if (new_nbpart == nbpart) return;
     
-        this->~simulation();  // Call destructor manually
-        new (this) simulation(new_nbpart); 
+            // Free old memory
+        delete[] hmass;
+        delete[] hx; delete[] hy; delete[] hz;
+        delete[] hvx; delete[] hvy; delete[] hvz;
+        delete[] hfx; delete[] hfy; delete[] hfz;
+
+        cudaFree(dmass);
+        cudaFree(dx); cudaFree(dy); cudaFree(dz);
+        cudaFree(dvx); cudaFree(dvy); cudaFree(dvz);
+        cudaFree(dfx); cudaFree(dfy); cudaFree(dfz);
     
         nbpart = new_nbpart;
         hmass = new double[nbpart]();
@@ -146,7 +154,6 @@ struct simulation {
         hfy = new double[nbpart](); 
         hfz = new double[nbpart]();
 
-        std::cout << "nbpart = " << nbpart << std::endl;
 
         CUDA_CHECK(cudaMalloc(&dmass, nbpart * sizeof(double)));
         CUDA_CHECK(cudaMalloc(&dx, nbpart * sizeof(double)));
