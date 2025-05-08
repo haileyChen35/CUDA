@@ -108,6 +108,28 @@ struct simulation {
     void resize(size_t new_nbpart) {
         if (new_nbpart == nbpart) return;
 
+        delete[] hmass; hmass = nullptr;
+        delete[] hx;  hx = nullptr;
+        delete[] hy; hy = nullptr;
+        delete[] hz; hz = nullptr;
+        delete[] hvx;  hvx = nullptr;
+        delete[] hvy;  hvy = nullptr;
+        delete[] hvz; hvz = nullptr;
+        delete[] hfx;  hfx = nullptr;
+        delete[] hfy;  hfy = nullptr;
+        delete[] hfz; hfz = nullptr;
+
+        cudaFree(dmass); dmass = nullptr;
+        cudaFree(dx); dx = nullptr;
+        cudaFree(dy); dy = nullptr;
+        cudaFree(dz); dz = nullptr;
+        cudaFree(dvx); dvx = nullptr;
+        cudaFree(dvy); dvy = nullptr;
+        cudaFree(dvz); dvz = nullptr;
+        cudaFree(dfx); dfx = nullptr;
+        cudaFree(dfy); dfy = nullptr;
+        cudaFree(dfz); dfz = nullptr;
+        
         new (this) simulation(new_nbpart);
 
         nbpart = new_nbpart;
@@ -203,29 +225,29 @@ void random_init(simulation& s) {
   }
     s.host_to_device();
 }
-void freeMemory(simulation& s){
-  delete[] s.hmass; 
-  delete[] s.hx;  
-  delete[] s.hy; 
-  delete[] s.hz; 
-  delete[] s.hvx;  
-  delete[] s.hvy; 
-  delete[] s.hvz; 
-  delete[] s.hfx; 
-  delete[] s.hfy;  
-  delete[] s.hfz; 
+// void freeMemory(simulation& s){
+//   delete[] s.hmass; 
+//   delete[] s.hx;  
+//   delete[] s.hy; 
+//   delete[] s.hz; 
+//   delete[] s.hvx;  
+//   delete[] s.hvy; 
+//   delete[] s.hvz; 
+//   delete[] s.hfx; 
+//   delete[] s.hfy;  
+//   delete[] s.hfz; 
 
-  cudaFree(s.dmass); 
-  cudaFree(s.dx); 
-  cudaFree(s.dy); 
-  cudaFree(s.dz); 
-  cudaFree(s.dvx); 
-  cudaFree(s.dvy); 
-  cudaFree(s.dvz); 
-  cudaFree(s.dfx); 
-  cudaFree(s.dfy); 
-  cudaFree(s.dfz); 
-}
+//   cudaFree(s.dmass); 
+//   cudaFree(s.dx); 
+//   cudaFree(s.dy); 
+//   cudaFree(s.dz); 
+//   cudaFree(s.dvx); 
+//   cudaFree(s.dvy); 
+//   cudaFree(s.dvz); 
+//   cudaFree(s.dfx); 
+//   cudaFree(s.dfy); 
+//   cudaFree(s.dfz); 
+// }
 void init_solar(simulation& s) {
   enum Planets {SUN, MERCURY, VENUS, EARTH, MARS, JUPITER, SATURN, URANUS, NEPTUNE, MOON};
   s = simulation(10);
@@ -427,8 +449,7 @@ int main(int argc, char* argv[]) {
   }
 
   auto end = std::chrono::high_resolution_clock::now();
-  freeMemory(*s);
-  *s = NULL;
+
   std::chrono::duration<double> elapsed = end - start;
   std::cout << "GPU Time: " << elapsed.count() << " s" << std::endl;
 }
