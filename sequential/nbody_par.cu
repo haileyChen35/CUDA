@@ -81,27 +81,6 @@ struct simulation {
 
     //release memory
     ~simulation(){
-        // delete[] hmass; hmass = nullptr;
-        // delete[] hx;  hx = nullptr;
-        // delete[] hy; hy = nullptr;
-        // delete[] hz; hz = nullptr;
-        // delete[] hvx;  hvx = nullptr;
-        // delete[] hvy;  hvy = nullptr;
-        // delete[] hvz; hvz = nullptr;
-        // delete[] hfx;  hfx = nullptr;
-        // delete[] hfy;  hfy = nullptr;
-        // delete[] hfz; hfz = nullptr;
-
-        // cudaFree(dmass); dmass = nullptr;
-        // cudaFree(dx); dx = nullptr;
-        // cudaFree(dy); dy = nullptr;
-        // cudaFree(dz); dz = nullptr;
-        // cudaFree(dvx); dvx = nullptr;
-        // cudaFree(dvy); dvy = nullptr;
-        // cudaFree(dvz); dvz = nullptr;
-        // cudaFree(dfx); dfx = nullptr;
-        // cudaFree(dfy); dfy = nullptr;
-        // cudaFree(dfz); dfz = nullptr;
 
         delete[] hmass;
         delete[] hx; 
@@ -187,29 +166,7 @@ void random_init(simulation& s) {
   }
     s.host_to_device();
 }
-// void freeMemory(simulation& s){
-//   delete[] s.hmass; 
-//   delete[] s.hx;  
-//   delete[] s.hy; 
-//   delete[] s.hz; 
-//   delete[] s.hvx;  
-//   delete[] s.hvy; 
-//   delete[] s.hvz; 
-//   delete[] s.hfx; 
-//   delete[] s.hfy;  
-//   delete[] s.hfz; 
 
-//   cudaFree(s.dmass); 
-//   cudaFree(s.dx); 
-//   cudaFree(s.dy); 
-//   cudaFree(s.dz); 
-//   cudaFree(s.dvx); 
-//   cudaFree(s.dvy); 
-//   cudaFree(s.dvz); 
-//   cudaFree(s.dfx); 
-//   cudaFree(s.dfy); 
-//   cudaFree(s.dfz); 
-// }
 void init_solar(simulation& s) {
   enum Planets {SUN, MERCURY, VENUS, EARTH, MARS, JUPITER, SATURN, URANUS, NEPTUNE, MOON};
   s = simulation(10);
@@ -324,16 +281,6 @@ __global__ void compute_forces_kernel(double* dmass, double* dx, double* dy, dou
 }
 
 
-// void dump_state(simulation& s) {
-//   std::cout<<s.nbpart<<'\t';
-//   for (size_t i=0; i<s.nbpart; ++i) {
-//     std::cout<<s.hmass[i]<<'\t';
-//     std::cout<<s.hx[i]<<'\t'<<s.hy[i]<<'\t'<<s.hz[i]<<'\t';
-//     std::cout<<s.hvx[i]<<'\t'<<s.hvy[i]<<'\t'<<s.hvz[i]<<'\t';
-//     std::cout<<s.hfx[i]<<'\t'<<s.hfy[i]<<'\t'<<s.hfz[i]<<'\t';
-//   }
-//   std::cout<<'\n';
-// }
 
 void load_from_file(simulation& s, std::string filename) {
   std::ifstream in (filename);
@@ -367,26 +314,27 @@ int main(int argc, char* argv[]) {
   size_t printevery = std::atol(argv[4]);
   int blockSize = std::atol(argv[5]);
 
-  simulation s(1);
+  simulation* s = nullptr;
+
 
   //parse command line
-  {
+  
     size_t nbpart = std::atol(argv[1]); //return 0 if not a number
     if ( nbpart > 0) {
-      s = simulation(nbpart);
-      random_init(s);
+      s = new simulation(nbpart);
+      random_init(*s);
     } else {
       std::string inputparam = argv[1];
       if (inputparam == "planet") {
-	init_solar(s);
-      } else{
-	load_from_file(s, inputparam);
+        s = new simulation(10); // will be overwritten in init_solar, so redundant
+        init_solar(*s);
+      } else {
+        load_from_file(*s, inputparam);
       }
-    }    
-  }
+    }
+  
 
-
-  int numBlocks = (s.nbpart + blockSize - 1) / blockSize;
+    int numBlocks = (s->nbpart + blockSize - 1) / blockSize;
 
   auto start = std::chrono::high_resolution_clock::now();
 
@@ -414,4 +362,5 @@ int main(int argc, char* argv[]) {
 
   std::chrono::duration<double> elapsed = end - start;
   std::cout << "GPU Time: " << elapsed.count() << " s" << std::endl;
+  delete s;
 }
