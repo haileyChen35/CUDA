@@ -1,18 +1,22 @@
 CXXFLAGS=-O3
 NVCC = nvcc
-CXXFLAGS = -O3 -std=c++11
-NVCC_FLAGS = -O3 -arch=sm_61
+CXX := g++
 
-Nbody = nbody
-Nbody_Par = nbody_par
 
-all: $(Nbody) $(Nbody_Par)
+# Targets
+EXECUTABLES := nbody nbody_par
 
-$(Nbody): nbody.cpp
+# Default target
+all: $(EXECUTABLES)
+
+# Serial version
+nbody: nbody.cpp
 	$(CXX) $(CXXFLAGS) $< -o $@
-	
-$(Nbody_Par): nbody_par.cu
-	$(NVCC) $(NVCC_FLAGS) $< -o $@
 
+# Parallel CUDA version
+nbody_par: nbody_par.cu
+	$(NVCC) $(CXXFLAGS) $< -o $@
+
+# Cleanup
 clean:
-	rm -f $(Nbody) $(Nbody_Par) *.out
+	rm -f $(EXECUTABLES) *.o *.out core* *.err *.log
