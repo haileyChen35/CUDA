@@ -108,30 +108,6 @@ struct simulation {
     void resize(size_t new_nbpart) {
         if (new_nbpart == nbpart) return;
 
-        delete[] hmass; hmass = nullptr;
-        delete[] hx;  hx = nullptr;
-        delete[] hy; hy = nullptr;
-        delete[] hz; hz = nullptr;
-        delete[] hvx;  hvx = nullptr;
-        delete[] hvy;  hvy = nullptr;
-        delete[] hvz; hvz = nullptr;
-        delete[] hfx;  hfx = nullptr;
-        delete[] hfy;  hfy = nullptr;
-        delete[] hfz; hfz = nullptr;
-
-        cudaFree(dmass); dmass = nullptr;
-        cudaFree(dx); dx = nullptr;
-        cudaFree(dy); dy = nullptr;
-        cudaFree(dz); dz = nullptr;
-        cudaFree(dvx); dvx = nullptr;
-        cudaFree(dvy); dvy = nullptr;
-        cudaFree(dvz); dvz = nullptr;
-        cudaFree(dfx); dfx = nullptr;
-        cudaFree(dfy); dfy = nullptr;
-        cudaFree(dfz); dfz = nullptr;
-        
-        new (this) simulation(new_nbpart);
-
         nbpart = new_nbpart;
         hmass = new double[nbpart]();
         hx = new double[nbpart](); 
