@@ -9,4 +9,4 @@ solar.out: nbody_par
 	date
 
 clean: 
-	rm *.out
+	rm nbody_par *.out
