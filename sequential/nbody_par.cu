@@ -76,16 +76,6 @@ struct simulation {
     cudaMalloc(&dfy, nb * sizeof(double));
     cudaMalloc(&dfz, nb * sizeof(double));
 
-    //initialize memory 
-    cudaMemset(dmass, 0, nb * sizeof(double));
-    cudaMemset(dx, 0, nb * sizeof(double));
-    cudaMemset(dy, 0, nb * sizeof(double));
-    cudaMemset(dz, 0, nb * sizeof(double));
-    cudaMemset(dvx, 0, nb * sizeof(double));
-    cudaMemset(dvy, 0, nb * sizeof(double));
-    cudaMemset(dvz, 0, nb * sizeof(double));
-    cudaMemset(dfx, 0, nb * sizeof(double));
-    cudaMemset(dfy, 0, nb * sizeof(double));
 
   }
 
@@ -327,16 +317,16 @@ __global__ void compute_forces_kernel(double* dmass, double* dx, double* dy, dou
 }
 
 
-void dump_state(simulation& s) {
-  std::cout<<s.nbpart<<'\t';
-  for (size_t i=0; i<s.nbpart; ++i) {
-    std::cout<<s.hmass[i]<<'\t';
-    std::cout<<s.hx[i]<<'\t'<<s.hy[i]<<'\t'<<s.hz[i]<<'\t';
-    std::cout<<s.hvx[i]<<'\t'<<s.hvy[i]<<'\t'<<s.hvz[i]<<'\t';
-    std::cout<<s.hfx[i]<<'\t'<<s.hfy[i]<<'\t'<<s.hfz[i]<<'\t';
-  }
-  std::cout<<'\n';
-}
+// void dump_state(simulation& s) {
+//   std::cout<<s.nbpart<<'\t';
+//   for (size_t i=0; i<s.nbpart; ++i) {
+//     std::cout<<s.hmass[i]<<'\t';
+//     std::cout<<s.hx[i]<<'\t'<<s.hy[i]<<'\t'<<s.hz[i]<<'\t';
+//     std::cout<<s.hvx[i]<<'\t'<<s.hvy[i]<<'\t'<<s.hvz[i]<<'\t';
+//     std::cout<<s.hfx[i]<<'\t'<<s.hfy[i]<<'\t'<<s.hfz[i]<<'\t';
+//   }
+//   std::cout<<'\n';
+// }
 
 void load_from_file(simulation& s, std::string filename) {
   std::ifstream in (filename);
@@ -408,6 +398,8 @@ int main(int argc, char* argv[]) {
                                                        s.dvx, s.dvy, s.dvz,
                                                        s.dfx, s.dfy, s.dfz,
                                                        s.dmass, s.nbpart, dt);
+
+       cudaDeviceSynchronize();
 
   }
 
