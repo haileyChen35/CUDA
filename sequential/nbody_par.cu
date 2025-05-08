@@ -358,8 +358,12 @@ int main(int argc, char* argv[]) {
                                                        s.dvx, s.dvy, s.dvz,
                                                        s.dfx, s.dfy, s.dfz,
                                                        s.dmass, s.nbpart, dt);
+      
+      
 
   }
+
+  cudaDeviceSynchronize()
 
   auto end = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> elapsed = end - start;
