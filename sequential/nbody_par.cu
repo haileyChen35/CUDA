@@ -143,7 +143,11 @@ struct simulation {
         cudaFree(dfx); cudaFree(dfy); cudaFree(dfz);
     
         nbpart = new_nbpart;
+        std::cout << "nbpart: " << nbpart << std::endl;
+
         hmass = new double[nbpart]();
+        std::cout << "hmass after new: " << hmass << std::endl;
+
         hx = new double[nbpart](); 
         hy = new double[nbpart](); 
         hz = new double[nbpart]();
@@ -156,6 +160,8 @@ struct simulation {
 
 
         CUDA_CHECK(cudaMalloc(&dmass, nbpart * sizeof(double)));
+        std::cout << "dmass: " << dmass << std::endl;
+
         CUDA_CHECK(cudaMalloc(&dx, nbpart * sizeof(double)));
         CUDA_CHECK(cudaMalloc(&dy, nbpart * sizeof(double)));
         CUDA_CHECK(cudaMalloc(&dz, nbpart * sizeof(double)));
@@ -179,6 +185,7 @@ struct simulation {
       }
     
     void host_to_device() {
+      if(nbpart > 0)
         CUDA_CHECK(cudaMemcpy(dmass, hmass, nbpart * sizeof(double), cudaMemcpyHostToDevice));
         CUDA_CHECK(cudaMemcpy(dx, hx, nbpart * sizeof(double), cudaMemcpyHostToDevice));
         CUDA_CHECK(cudaMemcpy(dy, hy, nbpart * sizeof(double), cudaMemcpyHostToDevice));
