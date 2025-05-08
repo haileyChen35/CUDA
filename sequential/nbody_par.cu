@@ -145,7 +145,9 @@ struct simulation {
         hfx = new double[nbpart](); 
         hfy = new double[nbpart](); 
         hfz = new double[nbpart]();
-    
+
+        std::cout << "nbpart = " << nbpart << std::endl;
+
         CUDA_CHECK(cudaMalloc(&dmass, nbpart * sizeof(double)));
         CUDA_CHECK(cudaMalloc(&dx, nbpart * sizeof(double)));
         CUDA_CHECK(cudaMalloc(&dy, nbpart * sizeof(double)));
