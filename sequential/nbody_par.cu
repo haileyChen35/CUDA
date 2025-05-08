@@ -94,7 +94,7 @@ struct simulation {
         delete[] hmass; hmass = nullptr;
         delete[] hx;  hx = nullptr;
         delete[] hy; hy = nullptr;
-        delete[] hz; hmahzss = nullptr;
+        delete[] hz; hz = nullptr;
         delete[] hvx;  hvx = nullptr;
         delete[] hvy;  hvy = nullptr;
         delete[] hvz; hvz = nullptr;
