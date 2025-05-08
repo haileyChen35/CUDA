@@ -11,20 +11,9 @@
 double G = 6.674*std::pow(10,-11);
 //double G = 1;
 
-#define CUDA_CHECK(call)                                                    \
-    do {                                                                    \
-        cudaError_t err = call;                                             \
-        if (err != cudaSuccess) {                                           \
-            std::cerr << "CUDA error in " << __FILE__ << ":" << __LINE__   \
-                      << " - " << cudaGetErrorString(err) << std::endl;    \
-            exit(EXIT_FAILURE);                                             \
-        }                                                                   \
-    } while (0)
-
-
 struct simulation {
   size_t nbpart;
-  
+
   //host 
   double* hmass;
   //position
@@ -58,11 +47,11 @@ struct simulation {
   double* dfx;
   double* dfy;
   double* dfz;
-  
 
-  
+
+
   simulation(size_t nb) : nbpart(nb) {
-    
+
     //allocate host memory
     hmass = new double[nb]();
     hx = new double[nb]();
@@ -76,27 +65,27 @@ struct simulation {
     hfz = new double[nb]();
 
     //allocate device memory
-    CUDA_CHECK(cudaMalloc(&dmass, nb*sizeof(double)));
-    CUDA_CHECK(cudaMalloc(&dx, nb * sizeof(double)));
-    CUDA_CHECK(cudaMalloc(&dy, nb * sizeof(double)));
-    CUDA_CHECK(cudaMalloc(&dz, nb * sizeof(double)));
-    CUDA_CHECK(cudaMalloc(&dvx, nb * sizeof(double)));
-    CUDA_CHECK(cudaMalloc(&dvy, nb * sizeof(double)));
-    CUDA_CHECK(cudaMalloc(&dvz, nb * sizeof(double)));
-    CUDA_CHECK(cudaMalloc(&dfx, nb * sizeof(double)));
-    CUDA_CHECK(cudaMalloc(&dfy, nb * sizeof(double)));
-    CUDA_CHECK(cudaMalloc(&dfz, nb * sizeof(double)));
+    cudaMalloc(&dmass, nb*sizeof(double));
+    cudaMalloc(&dx, nb * sizeof(double));
+    cudaMalloc(&dy, nb * sizeof(double));
+    cudaMalloc(&dz, nb * sizeof(double));
+    cudaMalloc(&dvx, nb * sizeof(double));
+    cudaMalloc(&dvy, nb * sizeof(double));
+    cudaMalloc(&dvz, nb * sizeof(double));
+    cudaMalloc(&dfx, nb * sizeof(double));
+    cudaMalloc(&dfy, nb * sizeof(double));
+    cudaMalloc(&dfz, nb * sizeof(double));
 
     //initialize memory 
-    // cudaMemset(dmass, 0, nb * sizeof(double));
-    // cudaMemset(dx, 0, nb * sizeof(double));
-    // cudaMemset(dy, 0, nb * sizeof(double));
-    // cudaMemset(dz, 0, nb * sizeof(double));
-    // cudaMemset(dvx, 0, nb * sizeof(double));
-    // cudaMemset(dvy, 0, nb * sizeof(double));
-    // cudaMemset(dvz, 0, nb * sizeof(double));
-    // cudaMemset(dfx, 0, nb * sizeof(double));
-    // cudaMemset(dfy, 0, nb * sizeof(double));
+    cudaMemset(dmass, 0, nb * sizeof(double));
+    cudaMemset(dx, 0, nb * sizeof(double));
+    cudaMemset(dy, 0, nb * sizeof(double));
+    cudaMemset(dz, 0, nb * sizeof(double));
+    cudaMemset(dvx, 0, nb * sizeof(double));
+    cudaMemset(dvy, 0, nb * sizeof(double));
+    cudaMemset(dvz, 0, nb * sizeof(double));
+    cudaMemset(dfx, 0, nb * sizeof(double));
+    cudaMemset(dfy, 0, nb * sizeof(double));
 
   }
 
@@ -126,31 +115,13 @@ struct simulation {
 
     }
 
-
-
     void resize(size_t new_nbpart) {
         if (new_nbpart == nbpart) return;
-    
-            // Free old memory
-        delete[] hmass;
-        delete[] hx; delete[] hy; delete[] hz;
-        delete[] hvx; delete[] hvy; delete[] hvz;
-        delete[] hfx; delete[] hfy; delete[] hfz;
 
-        cudaFree(dmass);
-        cudaFree(dx); cudaFree(dy); cudaFree(dz);
-        cudaFree(dvx); cudaFree(dvy); cudaFree(dvz);
-        cudaFree(dfx); cudaFree(dfy); cudaFree(dfz);
-    
+        this->~simulation();
+
         nbpart = new_nbpart;
-        
-
         hmass = new double[nbpart]();
-        if (hmass == nullptr) {
-          std::cerr << "ERROR: cudaMalloc failed for dmass!" << std::endl;
-          exit(1);
-        }
-
         hx = new double[nbpart](); 
         hy = new double[nbpart](); 
         hz = new double[nbpart]();
@@ -161,64 +132,56 @@ struct simulation {
         hfy = new double[nbpart](); 
         hfz = new double[nbpart]();
 
+        cudaMalloc(&dmass, nbpart * sizeof(double));
+        cudaMalloc(&dx, nbpart * sizeof(double));
+        cudaMalloc(&dy, nbpart * sizeof(double));
+        cudaMalloc(&dz, nbpart * sizeof(double));
+        cudaMalloc(&dvx, nbpart * sizeof(double));
+        cudaMalloc(&dvy, nbpart * sizeof(double));
+        cudaMalloc(&dvz, nbpart * sizeof(double));
+        cudaMalloc(&dfx, nbpart * sizeof(double));
+        cudaMalloc(&dfy, nbpart * sizeof(double));
+        cudaMalloc(&dfz, nbpart * sizeof(double));
 
-        CUDA_CHECK(cudaMalloc(&dmass, nbpart * sizeof(double)));
-        if (dmass == nullptr) {
-          std::cerr << "ERROR: cudaMalloc failed for dmass!" << std::endl;
-          exit(1);
-        }
-
-        CUDA_CHECK(cudaMalloc(&dx, nbpart * sizeof(double)));
-        CUDA_CHECK(cudaMalloc(&dy, nbpart * sizeof(double)));
-        CUDA_CHECK(cudaMalloc(&dz, nbpart * sizeof(double)));
-        CUDA_CHECK(cudaMalloc(&dvx, nbpart * sizeof(double)));
-        CUDA_CHECK(cudaMalloc(&dvy, nbpart * sizeof(double)));
-        CUDA_CHECK(cudaMalloc(&dvz, nbpart * sizeof(double)));
-        CUDA_CHECK(cudaMalloc(&dfx, nbpart * sizeof(double)));
-        CUDA_CHECK(cudaMalloc(&dfy, nbpart * sizeof(double)));
-        CUDA_CHECK(cudaMalloc(&dfz, nbpart * sizeof(double)));
-    
-        // cudaMemset(dmass, 0, nbpart * sizeof(double));
-        // cudaMemset(dx, 0, nbpart * sizeof(double));
-        // cudaMemset(dy, 0, nbpart * sizeof(double));
-        // cudaMemset(dz, 0, nbpart * sizeof(double));
-        // cudaMemset(dvx, 0, nbpart * sizeof(double));
-        // cudaMemset(dvy, 0, nbpart * sizeof(double));
-        // cudaMemset(dvz, 0, nbpart * sizeof(double));
-        // cudaMemset(dfx, 0, nbpart * sizeof(double));
-        // cudaMemset(dfy, 0, nbpart * sizeof(double));
-        // cudaMemset(dfz, 0, nbpart * sizeof(double));
+        cudaMemset(dmass, 0, nbpart * sizeof(double));
+        cudaMemset(dx, 0, nbpart * sizeof(double));
+        cudaMemset(dy, 0, nbpart * sizeof(double));
+        cudaMemset(dz, 0, nbpart * sizeof(double));
+        cudaMemset(dvx, 0, nbpart * sizeof(double));
+        cudaMemset(dvy, 0, nbpart * sizeof(double));
+        cudaMemset(dvz, 0, nbpart * sizeof(double));
+        cudaMemset(dfx, 0, nbpart * sizeof(double));
+        cudaMemset(dfy, 0, nbpart * sizeof(double));
+        cudaMemset(dfz, 0, nbpart * sizeof(double));
       }
-    
+
     void host_to_device() {
-      if(nbpart > 0){
-        CUDA_CHECK(cudaMemcpy(dmass, hmass, nbpart * sizeof(double), cudaMemcpyHostToDevice));
-        CUDA_CHECK(cudaMemcpy(dx, hx, nbpart * sizeof(double), cudaMemcpyHostToDevice));
-        CUDA_CHECK(cudaMemcpy(dy, hy, nbpart * sizeof(double), cudaMemcpyHostToDevice));
-        CUDA_CHECK(cudaMemcpy(dz, hz, nbpart * sizeof(double), cudaMemcpyHostToDevice));
-        CUDA_CHECK(cudaMemcpy(dvx, hvx, nbpart * sizeof(double), cudaMemcpyHostToDevice));
-        CUDA_CHECK(cudaMemcpy(dvy, hvy, nbpart * sizeof(double), cudaMemcpyHostToDevice));
-        CUDA_CHECK(cudaMemcpy(dvz, hvz, nbpart * sizeof(double), cudaMemcpyHostToDevice));
-        CUDA_CHECK(cudaMemcpy(dfx, hfx, nbpart * sizeof(double), cudaMemcpyHostToDevice));
-        CUDA_CHECK(cudaMemcpy(dfy, hfy, nbpart * sizeof(double), cudaMemcpyHostToDevice));
-        CUDA_CHECK(cudaMemcpy(dfz, hfz, nbpart * sizeof(double), cudaMemcpyHostToDevice));
-      }
+        cudaMemcpy(dmass, hmass, nbpart * sizeof(double), cudaMemcpyHostToDevice);
+        cudaMemcpy(dx, hx, nbpart * sizeof(double), cudaMemcpyHostToDevice);
+        cudaMemcpy(dy, hy, nbpart * sizeof(double), cudaMemcpyHostToDevice);
+        cudaMemcpy(dz, hz, nbpart * sizeof(double), cudaMemcpyHostToDevice);
+        cudaMemcpy(dvx, hvx, nbpart * sizeof(double), cudaMemcpyHostToDevice);
+        cudaMemcpy(dvy, hvy, nbpart * sizeof(double), cudaMemcpyHostToDevice);
+        cudaMemcpy(dvz, hvz, nbpart * sizeof(double), cudaMemcpyHostToDevice);
+        cudaMemcpy(dfx, hfx, nbpart * sizeof(double), cudaMemcpyHostToDevice);
+        cudaMemcpy(dfy, hfy, nbpart * sizeof(double), cudaMemcpyHostToDevice);
+        cudaMemcpy(dfz, hfz, nbpart * sizeof(double), cudaMemcpyHostToDevice);
     }
 
     void device_to_host() {
-        CUDA_CHECK(cudaMemcpy(hmass, dmass, nbpart * sizeof(double), cudaMemcpyDeviceToHost));
-        CUDA_CHECK(cudaMemcpy(hx, dx, nbpart * sizeof(double), cudaMemcpyDeviceToHost));
-        CUDA_CHECK(cudaMemcpy(hy, dy, nbpart * sizeof(double), cudaMemcpyDeviceToHost));
-        CUDA_CHECK(cudaMemcpy(hz, dz, nbpart * sizeof(double), cudaMemcpyDeviceToHost));
-        CUDA_CHECK(cudaMemcpy(hvx, dvx, nbpart * sizeof(double), cudaMemcpyDeviceToHost));
-        CUDA_CHECK(cudaMemcpy(hvy, dvy, nbpart * sizeof(double), cudaMemcpyDeviceToHost));
-        CUDA_CHECK(cudaMemcpy(hvz, dvz, nbpart * sizeof(double), cudaMemcpyDeviceToHost));
-        CUDA_CHECK(cudaMemcpy(hfx, dfx, nbpart * sizeof(double), cudaMemcpyDeviceToHost));
-        CUDA_CHECK(cudaMemcpy(hfy, dfy, nbpart * sizeof(double), cudaMemcpyDeviceToHost));
-        CUDA_CHECK(cudaMemcpy(hfz, dfz, nbpart * sizeof(double), cudaMemcpyDeviceToHost));
+      cudaMemcpy(hmass, dmass, nbpart * sizeof(double), cudaMemcpyDeviceToHost);
+      cudaMemcpy(hx, dx, nbpart * sizeof(double), cudaMemcpyDeviceToHost);
+      cudaMemcpy(hy, dy, nbpart * sizeof(double), cudaMemcpyDeviceToHost);
+      cudaMemcpy(hz, dz, nbpart * sizeof(double), cudaMemcpyDeviceToHost);
+      cudaMemcpy(hvx, dvx, nbpart * sizeof(double), cudaMemcpyDeviceToHost);
+      cudaMemcpy(hvy, dvy, nbpart * sizeof(double), cudaMemcpyDeviceToHost);
+      cudaMemcpy(hvz, dvz, nbpart * sizeof(double), cudaMemcpyDeviceToHost);
+      cudaMemcpy(hfx, dfx, nbpart * sizeof(double), cudaMemcpyDeviceToHost);
+      cudaMemcpy(hfy, dfy, nbpart * sizeof(double), cudaMemcpyDeviceToHost);
+      cudaMemcpy(hfz, dfz, nbpart * sizeof(double), cudaMemcpyDeviceToHost);
   }
 
-   
+
 };
 
 
@@ -237,7 +200,7 @@ void random_init(simulation& s) {
     s.hy[i] = dispos(gen);
     s.hz[i] = dispos(gen);
     s.hz[i] = 0.;
-    
+
     s.hvx[i] = disvel(gen);
     s.hvy[i] = disvel(gen);
     s.hvz[i] = disvel(gen);
@@ -365,15 +328,14 @@ __global__ void compute_forces_kernel(double* dmass, double* dx, double* dy, dou
 
 
 void dump_state(simulation& s) {
-  s.device_to_host();
-  for (size_t i = 0; i < s.nbpart; ++i) {
-      std::cout << "Particle " << i << ":\n";
-      std::cout << "  Mass: " << s.hmass[i] << " kg\n";
-      std::cout << "  Position: (" << s.hx[i] << ", " << s.hy[i] << ", " << s.hz[i] << ") m\n";
-      std::cout << "  Velocity: (" << s.hvx[i] << ", " << s.hvy[i] << ", " << s.hvz[i] << ") m/s\n";
-      std::cout << "  Force: (" << s.hfx[i] << ", " << s.hfy[i] << ", " << s.hfz[i] << ") N\n";
-      std::cout << std::endl;
+  std::cout<<s.nbpart<<'\t';
+  for (size_t i=0; i<s.nbpart; ++i) {
+    std::cout<<s.hmass[i]<<'\t';
+    std::cout<<s.hx[i]<<'\t'<<s.hy[i]<<'\t'<<s.hz[i]<<'\t';
+    std::cout<<s.hvx[i]<<'\t'<<s.hvy[i]<<'\t'<<s.hvz[i]<<'\t';
+    std::cout<<s.hfx[i]<<'\t'<<s.hfy[i]<<'\t'<<s.hfz[i]<<'\t';
   }
+  std::cout<<'\n';
 }
 
 void load_from_file(simulation& s, std::string filename) {
@@ -387,8 +349,8 @@ void load_from_file(simulation& s, std::string filename) {
     in >> s.hvx[i] >> s.hvy[i] >> s.hvz[i];
     in >> s.hfx[i] >> s.hfy[i] >> s.hfz[i];
   }
-
-  s.host_to_device();
+  if (!in.good())
+    throw "kaboom";
 }
 
 int main(int argc, char* argv[]) {
@@ -407,7 +369,8 @@ int main(int argc, char* argv[]) {
   size_t nbstep = std::atol(argv[3]);
   size_t printevery = std::atol(argv[4]);
   int blockSize = std::atol(argv[5]);
-  
+
+  simulation s;
   simulation s(1);
 
   //parse command line
@@ -426,39 +389,33 @@ int main(int argc, char* argv[]) {
     }    
   }
 
-  
+
   int numBlocks = (s.nbpart + blockSize - 1) / blockSize;
 
   auto start = std::chrono::high_resolution_clock::now();
-  
+
   for (size_t step = 0; step < nbstep; step++) {
       if (step % printevery == 0) {
+          s.device_to_host();
           dump_state(s);
       }
 
       reset_forces_kernel<<<numBlocks, blockSize>>>(s.dfx, s.dfy, s.dfz, s.nbpart);
-      
+
       // Compute forces on device
       compute_forces_kernel<<<numBlocks, blockSize>>>(s.dmass, s.dx, s.dy, s.dz, 
                                                     s.dfx, s.dfy, s.dfz, 
                                                     s.nbpart, G);
-      
+
       // Update positions and velocities
       update_particles_kernel<<<numBlocks, blockSize>>>(s.dx, s.dy, s.dz,
                                                        s.dvx, s.dvy, s.dvz,
                                                        s.dfx, s.dfy, s.dfz,
                                                        s.dmass, s.nbpart, dt);
-      
+
   }
-  cudaError_t err = cudaGetLastError();
-  if (err != cudaSuccess) {
-      std::cerr << "Kernel launch failed: " << cudaGetErrorString(err) << std::endl;
-  }
-  cudaDeviceSynchronize();
 
   auto end = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> elapsed = end - start;
   std::cout << "GPU Time: " << elapsed.count() << " s" << std::endl;
 }
-
-
