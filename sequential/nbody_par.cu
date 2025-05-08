@@ -186,8 +186,8 @@ struct simulation {
       CUDA_CHECK(cudaMemcpy(hmass, dmass, nbpart * sizeof(double), cudaMemcpyDeviceToHost));
       CUDA_CHECK(cudaMemcpy(hx, dx, nbpart * sizeof(double), cudaMemcpyDeviceToHost));
       CUDA_CHECK(cudaMemcpy(hy, dy, nbpart * sizeof(double), cudaMemcpyDeviceToHost));
-      CUDA_CHECK(cudaMemcpy(hz, dz, nbpart * sizeof(double), cudaMemcpyDeviceToHost);
-      CUDA_CHECK(cudaMemcpy(hvx, dvx, nbpart * sizeof(double), cudaMemcpyDeviceToHost)));
+      CUDA_CHECK(cudaMemcpy(hz, dz, nbpart * sizeof(double), cudaMemcpyDeviceToHost));
+      CUDA_CHECK(cudaMemcpy(hvx, dvx, nbpart * sizeof(double), cudaMemcpyDeviceToHost));
       CUDA_CHECK(cudaMemcpy(hvy, dvy, nbpart * sizeof(double), cudaMemcpyDeviceToHost));
       CUDA_CHECK(cudaMemcpy(hvz, dvz, nbpart * sizeof(double), cudaMemcpyDeviceToHost));
       CUDA_CHECK(cudaMemcpy(hfx, dfx, nbpart * sizeof(double), cudaMemcpyDeviceToHost));
