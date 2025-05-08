@@ -91,27 +91,27 @@ struct simulation {
 
     //release memory
     ~simulation(){
-        delete[] hmass;
-        delete[] hx; 
-        delete[] hy; 
-        delete[] hz;
-        delete[] hvx; 
-        delete[] hvy; 
-        delete[] hvz;
-        delete[] hfx; 
-        delete[] hfy; 
-        delete[] hfz;
+        delete[] hmass; hmass = nullptr;
+        delete[] hx;  hx = nullptr;
+        delete[] hy; hy = nullptr;
+        delete[] hz; hmahzss = nullptr;
+        delete[] hvx;  hvx = nullptr;
+        delete[] hvy;  hvy = nullptr;
+        delete[] hvz; hvz = nullptr;
+        delete[] hfx;  hfx = nullptr;
+        delete[] hfy;  hfy = nullptr;
+        delete[] hfz; hfz = nullptr;
 
-        cudaFree(dmass);
-        cudaFree(dx);
-        cudaFree(dy);
-        cudaFree(dz);
-        cudaFree(dvx);
-        cudaFree(dvy);
-        cudaFree(dvz);
-        cudaFree(dfx);
-        cudaFree(dfy);
-        cudaFree(dfz);
+        cudaFree(dmass); dmass = nullptr;
+        cudaFree(dx); dx = nullptr;
+        cudaFree(dy); dy = nullptr;
+        cudaFree(dz); dz = nullptr;
+        cudaFree(dvx); dvx = nullptr;
+        cudaFree(dvy); dvy = nullptr;
+        cudaFree(dvz); dvz = nullptr;
+        cudaFree(dfx); dfx = nullptr;
+        cudaFree(dfy); dfy = nullptr;
+        cudaFree(dfz); dfz = nullptr;
 
     }
 
