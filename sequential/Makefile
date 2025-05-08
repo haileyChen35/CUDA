@@ -7,3 +7,6 @@ solar.out: nbody_par
 	date
 	./nbody_par 1000 0.1 500 100 256 
 	date
+
+clean: 
+	rm *.out
